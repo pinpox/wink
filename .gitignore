@@ -48,3 +48,4 @@ seriennummern.csv
 config/mqtt.yml
 
 coverage
+vendor/bundle

@@ -32,6 +32,22 @@ module Wink
     config.application_name = "WINK"
     config.application_slogan = "(W)o (i)st mei(n)e Winke(k)atze?"
 
-    config.mqtt = config_for(:mqtt)
+    # Allow overriding paths via environment variables (for nix store deployment)
+    if ENV["WINK_STATE_DIR"]
+      state_dir = ENV["WINK_STATE_DIR"]
+      config.paths["tmp"] = "#{state_dir}/tmp"
+      config.paths["log"] = "#{state_dir}/log"
+      config.paths["storage"] = "#{state_dir}/storage"
+      config.paths["db"] = "#{state_dir}/db"
+    end
+
+    if ENV["WINK_CONFIG_DIR"]
+      config.mqtt = YAML.load_file(
+        File.join(ENV["WINK_CONFIG_DIR"], "mqtt.yml"),
+        aliases: true
+      ).fetch(Rails.env, {})
+    else
+      config.mqtt = config_for(:mqtt)
+    end
   end
 end
